@@ -20,6 +20,7 @@ import de.auktionmarkt.formular.internal.TypeDescriptors;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.support.GenericConversionService;
 
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class StringToDateConverterTest {
 
@@ -35,6 +37,7 @@ public class StringToDateConverterTest {
 
     @BeforeClass
     public static void prepare() {
+        LocaleContextHolder.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         conversionService = new GenericConversionService();
         conversionService.addConverter(new StringToDateConverter());
     }
