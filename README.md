@@ -1,5 +1,7 @@
 # Formular
 
+[![Build Status](https://travis-ci.org/auktion-markt/formular.svg?branch=master)](https://travis-ci.org/auktion-markt/formular)
+
 The goal of *Formular* is to provide an easy-to-use interface for creating, handling and rendering forms.
 
 ## Features
