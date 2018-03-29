@@ -37,13 +37,13 @@ public class StringToDateConverterTest {
 
     @BeforeClass
     public static void prepare() {
-        LocaleContextHolder.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         conversionService = new GenericConversionService();
         conversionService.addConverter(new StringToDateConverter());
     }
 
     @Test
     public void testConvertDate() {
+        LocaleContextHolder.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         // 2018-03-23 12:05:40+01:00
         TypeDescriptor typeDescriptor = ConverterTestUtils.createTypeDescriptor(Date.class);
         Assert.assertTrue(conversionService.canConvert(TypeDescriptors.STRING_TYPE, typeDescriptor));
@@ -53,6 +53,7 @@ public class StringToDateConverterTest {
 
     @Test
     public void testConvertLocalDateTime() {
+        LocaleContextHolder.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         // 2018-03-23 12:05:40+01:00
         TypeDescriptor typeDescriptor = ConverterTestUtils.createTypeDescriptor(LocalDateTime.class);
         Assert.assertTrue(conversionService.canConvert(TypeDescriptors.STRING_TYPE, typeDescriptor));
@@ -62,6 +63,7 @@ public class StringToDateConverterTest {
 
     @Test
     public void testConvertLocalTime() {
+        LocaleContextHolder.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         // 2018-03-23 12:05:40+01:00
         TypeDescriptor typeDescriptor = ConverterTestUtils.createTypeDescriptor(LocalTime.class);
         Assert.assertTrue(conversionService.canConvert(TypeDescriptors.STRING_TYPE, typeDescriptor));
@@ -71,6 +73,7 @@ public class StringToDateConverterTest {
 
     @Test
     public void testConvertLocalDate() {
+        LocaleContextHolder.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         // 2018-03-23 12:05:40+01:00
         TypeDescriptor typeDescriptor = ConverterTestUtils.createTypeDescriptor(LocalDate.class);
         Assert.assertTrue(conversionService.canConvert(TypeDescriptors.STRING_TYPE, typeDescriptor));
