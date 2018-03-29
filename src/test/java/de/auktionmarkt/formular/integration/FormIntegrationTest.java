@@ -38,7 +38,9 @@ public class FormIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("method=\"post\"")))
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("action=\"/test\"")))
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<label for optional int>>")))
-                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<label for required int>>")));
+                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<label for required int>>")))
+                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<title for embeddedForm>>")))
+                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<label for anotherString>>")));
 
         // Check if validation result is displayed properly
         requestBuilder = MockMvcRequestBuilders.post("/test_form")
@@ -51,7 +53,7 @@ public class FormIntegrationTest {
         // Check "real" submit
         requestBuilder = MockMvcRequestBuilders.post("/test_form")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("requiredInt=42&optionalInt=12");
+                .content("requiredInt=42&optionalInt=12&AString=HelloImTheValueOfAString&embeddedForm.anotherString=TheValueOfAnotherTestString");
         mockMvc.perform(requestBuilder)
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<p>successs</p>")));
@@ -62,6 +64,8 @@ public class FormIntegrationTest {
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("Mode: edit")))
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("value=\"42\"")))
-                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("value=\"12\"")));
+                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("value=\"12\"")))
+                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("value=\"HelloImTheValueOfAString\"")))
+                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("value=\"TheValueOfAnotherTestString\"")));
     }
 }

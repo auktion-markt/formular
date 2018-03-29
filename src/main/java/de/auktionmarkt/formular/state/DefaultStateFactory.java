@@ -56,6 +56,8 @@ public class DefaultStateFactory implements StateFactory {
         Map<String, FieldSpecification> fieldSpecificationMap = formSpecification.getFields();
         Map<String, FieldState> fieldStates = new HashMap<>(fieldSpecificationMap.size());
         BeanWrapperImpl modelWrapper = new BeanWrapperImpl(model);
+        // Prevent throwing org.springframework.beans.NullValueInNestedPathException on unset property
+        modelWrapper.setAutoGrowNestedPaths(true);
         for (FieldSpecification fieldSpecification : fieldSpecificationMap.values()) {
             Object value = modelWrapper.getPropertyValue(fieldSpecification.getPath());
             value = convertWhenNecessary(value);
@@ -67,8 +69,7 @@ public class DefaultStateFactory implements StateFactory {
     }
 
     @Override
-    public FormState createStateFromBindingResult(FormSpecification formSpecification,
-                                                                BindingResult bindingResult) {
+    public FormState createStateFromBindingResult(FormSpecification formSpecification, BindingResult bindingResult) {
         Objects.requireNonNull(formSpecification, "formSpecification must not be null");
         Objects.requireNonNull(bindingResult, "bindingResult must not be null");
         Map<String, FieldSpecification> fieldSpecificationMap = formSpecification.getFields();

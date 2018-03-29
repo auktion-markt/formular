@@ -34,6 +34,7 @@
     <label for="${field_specification.path}">${field_specification.label}</label>
     <@compress single_line=true><input type="${field_specification.type}"
            id="${field_specification.path}"
+           name="${field_specification.path}"
            <#if field_state.value?has_content>value="${field_state.value}"</#if>
            <#if field_state.errors?has_content>class="invalid"<#elseif form_state.submitted>class="valid"</#if>
            <#if (field_specification.parameters.required)?? && field_specification.parameters.required == true>required</#if>

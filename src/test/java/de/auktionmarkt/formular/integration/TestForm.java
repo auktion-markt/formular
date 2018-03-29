@@ -2,6 +2,7 @@ package de.auktionmarkt.formular.integration;
 
 import de.auktionmarkt.formular.specification.FieldTypes;
 import de.auktionmarkt.formular.specification.annotation.FormElement;
+import de.auktionmarkt.formular.specification.annotation.FormEmbedded;
 import de.auktionmarkt.formular.specification.annotation.FormInput;
 import lombok.Data;
 
@@ -27,4 +28,20 @@ class TestForm {
     @FormElement(order = -10)
     @FormInput(type = FieldTypes.PASSWORD, required = true, label = "Enter a password")
     private String password;
+
+    @FormElement
+    @FormInput(label = "<<label for aString>>")
+    private String aString;
+
+    @FormElement
+    @FormEmbedded(title = "<<title for embeddedForm>>")
+    private EmbeddedForm embeddedForm;
+
+    @Data
+    public static class EmbeddedForm {
+
+        @FormElement
+        @FormInput(label = "<<label for anotherString>>")
+        private String anotherString;
+    }
 }
