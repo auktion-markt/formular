@@ -45,6 +45,7 @@
     </#if>
 </#macro>
 
+<#--
 <#macro render_checkbox form_specification field_specification form_state field_state>
     <label for="${field_specification.path}">
         <@compress single_line=true><input type="checkbox"
@@ -57,3 +58,4 @@
         <span class="form-errors">Errors on this field: <#list field_state.errors as error>${error}<#sep>, </#list></span>
     </#if>
 </#macro>
+-->
