@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "formular.register-missing-converters",
+      "type": "java.lang.Boolean",
+      "description": "Automatically registering missing converters required for Formular",
+      "defaultValue": true
+    }
+  ]
+}

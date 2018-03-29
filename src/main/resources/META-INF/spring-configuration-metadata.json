@@ -1,0 +1,9 @@
+{
+  "groups": [
+    {
+      "name": "formular",
+      "type": "de.auktionmarkt.formular.configuration.FormularConfiguration",
+      "sourceType": "de.auktionmarkt.formular.configuration.FormularConfiguration"
+    }
+  ]
+}
