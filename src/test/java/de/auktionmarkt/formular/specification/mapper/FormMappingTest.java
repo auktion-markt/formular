@@ -1,6 +1,5 @@
 package de.auktionmarkt.formular.specification.mapper;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.auktionmarkt.formular.specification.FieldSpecification;
 import de.auktionmarkt.formular.specification.FieldTypes;
 import de.auktionmarkt.formular.specification.FormSpecification;
@@ -72,7 +71,6 @@ public class FormMappingTest {
         Assert.assertEquals("Enter a password", password.getLabel());
 
         FieldSpecification embeddedInteger = fieldMap.get("embeddedForm.anInteger");
-        System.out.println(embeddedInteger.getParameters().keySet());
         Assert.assertNotNull(embeddedInteger);
         Assert.assertEquals(FieldTypes.NUMBER, embeddedInteger.getType());
         Assert.assertEquals("An Embedded Form", ((Supplier<String>) embeddedInteger.getParameters().get("titleSupplier")).get());
@@ -82,7 +80,6 @@ public class FormMappingTest {
         FieldSpecification embeddedString = fieldMap.get("embeddedForm.AString");
         Assert.assertNotNull(embeddedString);
         Assert.assertEquals(FieldTypes.TEXT, embeddedString.getType());
-        System.out.println(embeddedString.getParameters());
         Assert.assertTrue((Boolean) embeddedString.getParameters().get("groupEnd"));
         Assert.assertEquals("embeddedForm", embeddedString.getParameters().get("parent"));
     }
