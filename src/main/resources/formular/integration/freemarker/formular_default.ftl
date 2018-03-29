@@ -33,13 +33,26 @@
 <#macro render_input_field form_specification field_specification form_state field_state>
     <label for="${field_specification.path}">${field_specification.label}</label>
     <@compress single_line=true><input type="${field_specification.type}"
-           id="${field_specification.path}"
-           name="${field_specification.path}"
-           <#if field_state.value?has_content>value="${field_state.value}"</#if>
-           <#if field_state.errors?has_content>class="invalid"<#elseif form_state.submitted>class="valid"</#if>
-           <#if (field_specification.parameters.required)?? && field_specification.parameters.required == true>required</#if>
-           <#if field_specification.parameters.minValue??>min="${field_specification.parameters.minValue?c}"</#if>
-           <#if field_specification.parameters.maxValue??>max="${field_specification.parameters.maxValue?c}"</#if>></@compress>
+        id="${field_specification.path}"
+        name="${field_specification.path}"
+        <#if field_state.value?has_content>value="${field_state.value}"</#if>
+        <#if field_state.errors?has_content>class="invalid"<#elseif form_state.submitted>class="valid"</#if>
+        <#if (field_specification.parameters.required)?? && field_specification.parameters.required == true>required</#if>
+        <#if field_specification.parameters.minValue??>min="${field_specification.parameters.minValue?c}"</#if>
+        <#if field_specification.parameters.maxValue??>max="${field_specification.parameters.maxValue?c}"</#if>></@compress>
+    <#if field_state.errors?has_content>
+        <span class="form-errors">Errors on this field: <#list field_state.errors as error>${error}<#sep>, </#list></span>
+    </#if>
+</#macro>
+
+<#macro render_checkbox form_specification field_specification form_state field_state>
+    <label for="${field_specification.path}">
+        <@compress single_line=true><input type="checkbox"
+            id="${field_specification.path}"
+            name="${field_specification.path}"
+            <#if (field_specification.parameters.required)?? && field_specification.parameters.required == true>required</#if>>
+        ${field_specification.label}
+    </label>
     <#if field_state.errors?has_content>
         <span class="form-errors">Errors on this field: <#list field_state.errors as error>${error}<#sep>, </#list></span>
     </#if>
