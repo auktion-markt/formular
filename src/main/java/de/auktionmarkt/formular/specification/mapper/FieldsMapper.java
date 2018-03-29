@@ -8,16 +8,25 @@ import java.util.Collection;
 
 public interface FieldsMapper {
 
+    /**
+     * Checks if the field is supported by this {@link FieldsMapper}.
+     *
+     * @param model The model class
+     * @param propertyDescriptor The {@link PropertyDescriptor} of the property which might be mapped
+     * @param typeDescriptor The {@link TypeDescriptor} of the property which might be mapped
+     * @return {@code true} when the mapper supports this field, otherwise {@code false}
+     */
     boolean supportsField(Class<?> model, PropertyDescriptor propertyDescriptor, TypeDescriptor typeDescriptor);
 
     /**
      * Create form fields for the given property. Each property may result in multiple fields, allows embedded
      * forms or complex structures (e.g. a number-type value and a select-type unit).
      *
-     * @param model
-     * @param propertyDescriptor
-     * @param typeDescriptor
-     * @return
+     * @param callingFormMapper The {@link FormMapper} instance which is calling the method
+     * @param model The model class
+     * @param propertyDescriptor The {@link PropertyDescriptor} of the property which should be mapped
+     * @param typeDescriptor The {@link TypeDescriptor} of the property which should be mapped
+     * @return A {@link Collection} of mapped {@link FieldSpecification}s
      */
     Collection<FieldSpecification> mapFieldSpecification(FormMapper callingFormMapper, Class<?> model,
                                                          PropertyDescriptor propertyDescriptor,
