@@ -26,7 +26,7 @@ import java.util.Objects;
 
 /**
  * Represents the state of a single form field. The state is either {@code null} when no value is set, a {@link String}
- * or a {@link Collection}&lte;{@link String}&gte;.
+ * or a {@link Collection} of content type {@link String}.
  */
 @Data
 public class FieldState {
