@@ -4,12 +4,12 @@ import de.auktionmarkt.formular.specification.FieldSpecification;
 import de.auktionmarkt.formular.specification.FieldTypes;
 import de.auktionmarkt.formular.specification.annotation.FormInput;
 import de.auktionmarkt.formular.specification.mapper.AbstractAnnotatedInputFieldsMapper;
+import de.auktionmarkt.formular.specification.mapper.FormMapper;
 import de.auktionmarkt.formular.specification.mapper.FormMappingException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.stereotype.Component;
 
 import java.beans.PropertyDescriptor;
 import java.util.Arrays;
@@ -25,7 +25,6 @@ import java.util.stream.Stream;
 /**
  * Maps selection fields of type
  */
-@Component
 public class EnumFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     public EnumFieldsMapper(BeanFactory beanFactory, ConversionService conversionService) {
@@ -42,7 +41,8 @@ public class EnumFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Collection<FieldSpecification> mapFieldSpecification(Class<?> model, PropertyDescriptor propertyDescriptor,
+    public Collection<FieldSpecification> mapFieldSpecification(FormMapper callingFormMapper, Class<?> model,
+                                                                PropertyDescriptor propertyDescriptor,
                                                                 TypeDescriptor typeDescriptor) {
         Class<?> elementClass = FieldMapperUtils.unpackType(typeDescriptor);
         if (elementClass == null)
@@ -62,7 +62,7 @@ public class EnumFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
         if (type.isEmpty())
             type = typeDescriptor.isCollection() ? FieldTypes.CHECKBOX : FieldTypes.SELECT;
         return Collections.singleton(prepareMapFieldSpecification(propertyDescriptor, typeDescriptor)
-                .valueSupplier(valueSupplier)
+                .valuesSupplier(valueSupplier)
                 .type(type)
                 .build());
     }

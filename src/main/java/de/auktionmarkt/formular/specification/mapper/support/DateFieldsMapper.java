@@ -3,11 +3,11 @@ package de.auktionmarkt.formular.specification.mapper.support;
 import de.auktionmarkt.formular.specification.FieldSpecification;
 import de.auktionmarkt.formular.specification.FieldTypes;
 import de.auktionmarkt.formular.specification.mapper.AbstractAnnotatedInputFieldsMapper;
+import de.auktionmarkt.formular.specification.mapper.FormMapper;
 import de.auktionmarkt.formular.specification.mapper.FormMappingException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.stereotype.Component;
 
 import java.beans.PropertyDescriptor;
 import java.time.LocalDate;
@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-@Component
 public class DateFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     public DateFieldsMapper(BeanFactory beanFactory, ConversionService conversionService) {
@@ -34,7 +33,8 @@ public class DateFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
     }
 
     @Override
-    public Collection<FieldSpecification> mapFieldSpecification(Class<?> model, PropertyDescriptor propertyDescriptor,
+    public Collection<FieldSpecification> mapFieldSpecification(FormMapper callingFormMapper, Class<?> model,
+                                                                PropertyDescriptor propertyDescriptor,
                                                                 TypeDescriptor typeDescriptor) {
         FieldSpecification.Builder builder = prepareMapFieldSpecification(propertyDescriptor, typeDescriptor);
         String type;

@@ -1,5 +1,6 @@
 package de.auktionmarkt.formular.specification.mapper;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.auktionmarkt.formular.specification.FieldSpecification;
 import de.auktionmarkt.formular.specification.FieldTypes;
 import de.auktionmarkt.formular.specification.FormSpecification;
@@ -17,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {TestBeans.class, DefaultFormMapper.class, BasicFieldsMapper.class,
@@ -26,6 +28,7 @@ public class FormMappingTest {
     @Autowired
     private FormMapper formMapper;
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testMapping() {
         FormSpecification formSpecification =
@@ -35,12 +38,12 @@ public class FormMappingTest {
         Assert.assertEquals("post", formSpecification.getMethod());
         Assert.assertEquals("/test", formSpecification.getActionScheme());
         Map<String, FieldSpecification> fieldMap = formSpecification.getFields();
-        Assert.assertEquals(4, fieldMap.size());
+        Assert.assertEquals(6, fieldMap.size());
 
         // Check order
         List<FieldSpecification> fields = new ArrayList<>(fieldMap.values());
         Assert.assertEquals("password", fields.get(0).getPath());
-        Assert.assertEquals("localDateTime", fields.get(3).getPath());
+        Assert.assertEquals("localDateTime", fields.get(5).getPath());
 
         FieldSpecification requiredInt = fieldMap.get("requiredInt");
         Assert.assertNotNull(requiredInt);
@@ -67,5 +70,20 @@ public class FormMappingTest {
         Assert.assertEquals(FieldTypes.PASSWORD, password.getType());
         Assert.assertEquals(Boolean.TRUE, password.getParameters().get("required"));
         Assert.assertEquals("Enter a password", password.getLabel());
+
+        FieldSpecification embeddedInteger = fieldMap.get("embeddedForm.anInteger");
+        System.out.println(embeddedInteger.getParameters().keySet());
+        Assert.assertNotNull(embeddedInteger);
+        Assert.assertEquals(FieldTypes.NUMBER, embeddedInteger.getType());
+        Assert.assertEquals("An Embedded Form", ((Supplier<String>) embeddedInteger.getParameters().get("titleSupplier")).get());
+        Assert.assertEquals("embeddedForm", embeddedInteger.getParameters().get("parent"));
+        Assert.assertTrue((Boolean) embeddedInteger.getParameters().get("groupStart"));
+
+        FieldSpecification embeddedString = fieldMap.get("embeddedForm.AString");
+        Assert.assertNotNull(embeddedString);
+        Assert.assertEquals(FieldTypes.TEXT, embeddedString.getType());
+        System.out.println(embeddedString.getParameters());
+        Assert.assertTrue((Boolean) embeddedString.getParameters().get("groupEnd"));
+        Assert.assertEquals("embeddedForm", embeddedString.getParameters().get("parent"));
     }
 }

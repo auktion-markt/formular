@@ -30,6 +30,19 @@ public class FieldSpecification {
         return getLabelSupplier().get();
     }
 
+    public Builder toBuilder() {
+        Map<String, Object> parameters = getParameters();
+        return new Builder()
+                .propertyDescriptor(getPropertyDescriptor())
+                .typeDescriptor(getTypeDescriptor())
+                .labelSupplier(getLabelSupplier())
+                .path(getPath())
+                .type(getType())
+                .parameters(parameters != null ? new HashMap<>(parameters) : null)
+                .order(getOrder())
+                .valuesSupplier(getValuesSupplier());
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -120,7 +133,7 @@ public class FieldSpecification {
             return order;
         }
 
-        public Builder valueSupplier(Supplier<Map<String, String>> valuesSupplier) {
+        public Builder valuesSupplier(Supplier<Map<String, String>> valuesSupplier) {
             this.valuesSupplier = valuesSupplier;
             return this;
         }

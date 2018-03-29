@@ -5,6 +5,7 @@ import de.auktionmarkt.formular.specification.FieldSpecification;
 import de.auktionmarkt.formular.specification.annotation.FormElement;
 import de.auktionmarkt.formular.specification.annotation.FormInput;
 import de.auktionmarkt.formular.specification.annotation.SkipJsr380;
+import de.auktionmarkt.formular.specification.mapper.support.FieldMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -35,7 +36,7 @@ public abstract class AbstractAnnotatedInputFieldsMapper implements FieldsMapper
             LOGGER.info("JSR-380 found and partially supported for form mapping");
     }
 
-    private final BeanFactory beanFactory;
+    protected final BeanFactory beanFactory;
     protected final ConversionService conversionService;
 
     @Autowired
@@ -75,7 +76,8 @@ public abstract class AbstractAnnotatedInputFieldsMapper implements FieldsMapper
         String type = formInput.type();
         if (type.isEmpty())
             type = null;
-        Supplier<String> labelSupplier = getLabelSupplier(formInput, propertyDescriptor);
+        Supplier<String> labelSupplier = FieldMapperUtils.getStringSupplier(beanFactory, propertyDescriptor,
+                formInput.labelSupplierBean(), formInput.label());
         return builder
                 .propertyDescriptor(propertyDescriptor)
                 .typeDescriptor(typeDescriptor)
@@ -84,20 +86,6 @@ public abstract class AbstractAnnotatedInputFieldsMapper implements FieldsMapper
                 .type(type)
                 .parameters(parameters)
                 .order(formElement.order());
-    }
-
-    @SuppressWarnings("unchecked")
-    private Supplier<String> getLabelSupplier(FormInput formInput, PropertyDescriptor propertyDescriptor) {
-        String label = formInput.label();
-        if (label.isEmpty()) {
-            String labelSupplierBean = formInput.labelSupplierBean();
-            if (labelSupplierBean.isEmpty())
-                return propertyDescriptor::getDisplayName;
-            else
-                return beanFactory.getBean(labelSupplierBean, Supplier.class);
-        } else {
-            return () -> label;
-        }
     }
 
     /**

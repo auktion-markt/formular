@@ -1,7 +1,6 @@
 package de.auktionmarkt.formular.specification.mapper.support;
 
 import de.auktionmarkt.formular.specification.FieldSpecification;
-import de.auktionmarkt.formular.specification.FormSpecification;
 import de.auktionmarkt.formular.specification.annotation.FormElement;
 import de.auktionmarkt.formular.specification.mapper.FieldsMapper;
 import de.auktionmarkt.formular.specification.mapper.FieldsMapperService;
@@ -28,8 +27,7 @@ public class DefaultFormMapper implements FormMapper {
     private final FieldsMapperService fieldsMapperService;
 
     @Override
-    public FormSpecification mapFormSpecification(Class<?> dataClass, String method, String actionScheme) {
-        LOGGER.debug("Building form specification for class {}...", dataClass);
+    public List<FieldSpecification> mapFields(Class<?> dataClass) {
         BeanWrapperImpl wrapper = new BeanWrapperImpl(dataClass);
         PropertyDescriptor[] propertyDescriptors = wrapper.getPropertyDescriptors();
         List<FieldSpecification> fields;
@@ -46,15 +44,15 @@ public class DefaultFormMapper implements FormMapper {
                 Collection<FieldSpecification> fieldSpecifications;
                 try {
                     fieldSpecifications =
-                            fieldsMapper.mapFieldSpecification(dataClass, propertyDescriptor, typeDescriptor);
+                            fieldsMapper.mapFieldSpecification(this, dataClass,
+                                    propertyDescriptor, typeDescriptor);
                 } catch (Throwable throwable) {
                     throw new FormMappingException("Field mapper " + fieldsMapper.getClass().getName() +
-                            " has thrown an exception", throwable);
+                            " has thrown an exception on property " + propertyDescriptor.getName(), throwable);
                 }
                 if (fieldSpecifications == null) {
                     throw new FormMappingException("Field mapper " + fieldsMapper.getClass().getName() +
-                            " returned null as the mapping result for " + dataClass.getName() + "#" +
-                            propertyDescriptor.getName());
+                            " returned null as the mapping result for property" + propertyDescriptor.getName());
                 }
                 if (!fieldSpecifications.isEmpty()) {
                     if (LOGGER.isTraceEnabled()) {
@@ -71,6 +69,6 @@ public class DefaultFormMapper implements FormMapper {
             LOGGER.trace("No accessible fields on class {}", dataClass);
             fields = Collections.emptyList();
         }
-        return FormSpecification.create(dataClass, method, actionScheme, fields);
+        return fields;
     }
 }

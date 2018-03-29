@@ -1,5 +1,6 @@
 package de.auktionmarkt.formular.specification.mapper;
 
+import de.auktionmarkt.formular.specification.mapper.support.DefaultFormMapper;
 import de.auktionmarkt.formular.support.converter.DateToStringConverter;
 import de.auktionmarkt.formular.support.converter.StringToDateConverter;
 import de.auktionmarkt.formular.specification.mapper.support.DefaultFieldsMapperService;
@@ -28,5 +29,10 @@ class TestBeans {
                 conversionService);
         bean.sort();
         return bean;
+    }
+
+    @Bean
+    public FormMapper formMapper(FieldsMapperService fieldsMapperService) {
+        return new DefaultFormMapper(fieldsMapperService);
     }
 }

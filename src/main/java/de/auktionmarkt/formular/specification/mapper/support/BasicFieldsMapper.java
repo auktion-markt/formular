@@ -3,11 +3,10 @@ package de.auktionmarkt.formular.specification.mapper.support;
 import de.auktionmarkt.formular.specification.FieldSpecification;
 import de.auktionmarkt.formular.specification.FieldTypes;
 import de.auktionmarkt.formular.specification.mapper.AbstractAnnotatedInputFieldsMapper;
+import de.auktionmarkt.formular.specification.mapper.FormMapper;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -23,7 +22,6 @@ import java.util.Map;
  * Handles basic types (boolean, byte, short, int, long, float, double, the wrapper classes of all the previous and
  * {@link String}).
  */
-@Component
 public class BasicFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     private static final Map<Class<?>, Configurer> CONFIGURER;
@@ -55,7 +53,6 @@ public class BasicFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
         CONFIGURER = Collections.unmodifiableMap(configurer);
     }
 
-    @Autowired
     public BasicFieldsMapper(BeanFactory beanFactory, ConversionService conversionService) {
         super(beanFactory, conversionService);
     }
@@ -67,7 +64,8 @@ public class BasicFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
     }
 
     @Override
-    public Collection<FieldSpecification> mapFieldSpecification(Class<?> model, PropertyDescriptor propertyDescriptor,
+    public Collection<FieldSpecification> mapFieldSpecification(FormMapper callingFormMapper, Class<?> model,
+                                                                PropertyDescriptor propertyDescriptor,
                                                                 TypeDescriptor typeDescriptor) {
         FieldSpecification.Builder builder = prepareMapFieldSpecification(propertyDescriptor, typeDescriptor);
         Class<?> type = typeDescriptor.getType();

@@ -7,19 +7,17 @@ import de.auktionmarkt.formular.specification.annotation.FormInput;
 import de.auktionmarkt.formular.specification.annotation.JpaValuesByRepositoryMethod;
 import de.auktionmarkt.formular.specification.mapper.AbstractAnnotatedInputFieldsMapper;
 import de.auktionmarkt.formular.specification.mapper.FieldsMapper;
+import de.auktionmarkt.formular.specification.mapper.FormMapper;
 import de.auktionmarkt.formular.specification.mapper.FormMappingException;
 import de.auktionmarkt.formular.specification.support.RepositoryParameterFiller;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cglib.reflect.FastClass;
 import org.springframework.cglib.reflect.FastMethod;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.support.Repositories;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.metamodel.Attribute;
@@ -50,8 +48,6 @@ import java.util.function.Supplier;
  * primary-key-to-string conversion is done using the global conversion service.
  */
 // ToDo: Maybe support for MapAttributes
-@Component
-@ConditionalOnClass(name = "javax.persistence.EntityManager")
 public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     private static final Set<Attribute.PersistentAttributeType> SUPPORTED_PERSISTENCE_ATTRIBUTE_TYPES =
@@ -63,7 +59,6 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
     private final BeanFactory beanFactory;
     private final Repositories repositories;
 
-    @Autowired
     public EntityFieldsMapper(ConversionService conversionService, EntityManagerFactory entityManagerFactory,
                               ListableBeanFactory listableBeanFactory) {
         super(listableBeanFactory, conversionService);
@@ -96,7 +91,8 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
     }
 
     @Override
-    public Collection<FieldSpecification> mapFieldSpecification(Class<?> model, PropertyDescriptor propertyDescriptor,
+    public Collection<FieldSpecification> mapFieldSpecification(FormMapper callingFormMapper, Class<?> model,
+                                                                PropertyDescriptor propertyDescriptor,
                                                                 TypeDescriptor typeDescriptor) {
         Metamodel metamodel = entityManagerFactory.getMetamodel();
         ManagedType<?> managedType = metamodel.managedType(model);
@@ -118,7 +114,7 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
             type = typeDescriptor.isCollection() ? FieldTypes.CHECKBOX : FieldTypes.SELECT;
         Supplier<Map<String, String>> valueSupplier = valueSupplier(entityType, rawValueSupplier);
         return Collections.singleton(prepareMapFieldSpecification(propertyDescriptor, typeDescriptor)
-                .valueSupplier(valueSupplier)
+                .valuesSupplier(valueSupplier)
                 .type(type)
                 .build());
     }

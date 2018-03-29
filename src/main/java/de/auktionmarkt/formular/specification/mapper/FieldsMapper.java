@@ -19,6 +19,7 @@ public interface FieldsMapper {
      * @param typeDescriptor
      * @return
      */
-    Collection<FieldSpecification> mapFieldSpecification(Class<?> model, PropertyDescriptor propertyDescriptor,
+    Collection<FieldSpecification> mapFieldSpecification(FormMapper callingFormMapper, Class<?> model,
+                                                         PropertyDescriptor propertyDescriptor,
                                                          TypeDescriptor typeDescriptor);
 }

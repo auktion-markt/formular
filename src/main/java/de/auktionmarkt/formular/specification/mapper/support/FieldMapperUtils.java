@@ -4,9 +4,12 @@ import de.auktionmarkt.formular.specification.FieldSpecification;
 import de.auktionmarkt.formular.specification.annotation.FormInput;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.convert.TypeDescriptor;
 
+import java.beans.PropertyDescriptor;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FieldMapperUtils {
@@ -44,5 +47,18 @@ public class FieldMapperUtils {
     public static FieldSpecification.Builder setTypeIfAbsent(FieldSpecification.Builder builder, String type) {
         String previousType = builder.type();
         return previousType == null || previousType.isEmpty() ? builder.type(type) : builder;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Supplier<String> getStringSupplier(BeanFactory beanFactory, PropertyDescriptor propertyDescriptor,
+                                                     String beanName, String labelValue) {
+        if (labelValue.isEmpty()) {
+            if (beanName.isEmpty())
+                return propertyDescriptor::getDisplayName;
+            else
+                return beanFactory.getBean(beanName, Supplier.class);
+        } else {
+            return () -> labelValue;
+        }
     }
 }
