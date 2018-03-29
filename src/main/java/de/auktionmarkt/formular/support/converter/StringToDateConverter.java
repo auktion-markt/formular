@@ -72,7 +72,7 @@ public class StringToDateConverter implements ConditionalGenericConverter {
             } else if (type.isAssignableFrom(Date.class)) {
                 LocalDateTime parsed = LocalDateTime.parse(Objects.toString(source),
                         DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(zoneId));
-                return Date.from(parsed.atZone(ZoneId.systemDefault()).toInstant());
+                return Date.from(parsed.atZone(zoneId).toInstant());
             }
         } catch (DateTimeParseException ignore) {
             return null;
