@@ -24,6 +24,8 @@ import lombok.Data;
 
 import javax.validation.constraints.Max;
 import java.time.LocalDateTime;
+import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Data
@@ -57,6 +59,10 @@ class TestForm {
     @FormElement
     @FormInput(label = "<<label for singleSelected>>")
     private TimeUnit singleSelected;
+
+    @FormElement
+    @FormInput(label = "<<label for multiSelected>>", elementType = Locale.Category.class)
+    private Set<Locale.Category> multiSelected;
 
     @FormElement
     @FormEmbedded(title = "<<title for embeddedForm>>")

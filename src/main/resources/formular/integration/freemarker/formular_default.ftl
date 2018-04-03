@@ -47,16 +47,30 @@
     </#if>
 </#macro>
 
-
 <#macro render_checkbox form_specification field_specification form_state field_state>
-    <label for="${field_specification.path}">
-        <@compress single_line=true><input type="checkbox"
-            id="${field_specification.path}"
-            name="${field_specification.path}"
-            <#if field_state.isChecked()>checked</#if>
-            <#if (field_specification.parameters.required)?? && field_specification.parameters.required == true>required</#if>>
-        ${field_specification.label}</@compress>
-    </label>
+    <#if field_specification.valuesSupplier??>
+        <h4>${field_specification.label}</h4>
+        <#list field_specification.valuesSupplier.get() as value, label>
+            <label for="${field_specification.path}">
+                <@compress single_line=true><input type="checkbox"
+                    id="${field_specification.path}"
+                    name="${field_specification.path}"
+                    value="${value}"
+                    <#if field_state.valueContains(value)>checked</#if>
+                    <#if (field_specification.parameters.required)?? && field_specification.parameters.required == true>required</#if>>
+                ${label}</@compress>
+            </label>
+        </#list>
+    <#else>
+        <label for="${field_specification.path}">
+            <@compress single_line=true><input type="checkbox"
+                id="${field_specification.path}"
+                name="${field_specification.path}"
+                <#if field_state.isChecked()>checked</#if>
+                <#if (field_specification.parameters.required)?? && field_specification.parameters.required == true>required</#if>>
+            ${field_specification.label}</@compress>
+        </label>
+    </#if>
     <#if field_state.errors?has_content>
         <span class="form-errors">Errors on this field: <#list field_state.errors as error>${error}<#sep>, </#list></span>
     </#if>
