@@ -76,7 +76,8 @@ public class GenericFieldsMapperService implements ConfigurableFieldsMapperRegis
             if (fieldsMapper.supportsField(model, propertyDescriptor, typeDescriptor))
                 return fieldsMapper;
         }
-        throw new UnsupportedOperationException("No fields mappers registered");
+        throw new UnsupportedOperationException("No mapper found for property " + propertyDescriptor.getName() +
+                " on " + model.getName());
     }
 
     /**
