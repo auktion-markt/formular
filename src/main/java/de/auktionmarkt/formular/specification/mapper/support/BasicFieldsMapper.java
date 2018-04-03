@@ -46,6 +46,7 @@ public class BasicFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
         Map<Class<?>, Configurer> configurer = new HashMap<>();
         configurer.put(boolean.class, (builder, model, propertyDescriptor, typeDescriptor) ->
                 FieldMapperUtils.setTypeIfAbsent(builder, FieldTypes.CHECKBOX));
+        configurer.put(Boolean.class, configurer.get(boolean.class));
         configurer.put(byte.class, (builder, model, propertyDescriptor, typeDescriptor) ->
                 configureNumber(builder, typeDescriptor, Byte.MIN_VALUE, Byte.MAX_VALUE));
         configurer.put(Byte.class, configurer.get(byte.class));
