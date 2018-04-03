@@ -18,12 +18,10 @@ package de.auktionmarkt.formular.integration;
 
 import de.auktionmarkt.formular.specification.FormSpecification;
 import de.auktionmarkt.formular.specification.mapper.FormMapper;
+import de.auktionmarkt.formular.specification.mapper.support.DefaultFormMapper;
 import de.auktionmarkt.formular.support.converter.DateToStringConverter;
 import de.auktionmarkt.formular.support.converter.StringToDateConverter;
 import de.auktionmarkt.formular.specification.mapper.FieldsMapperService;
-import de.auktionmarkt.formular.specification.mapper.support.DefaultFieldsMapperService;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConversionService;
@@ -42,11 +40,8 @@ class TestBeans {
     }
 
     @Bean
-    public FieldsMapperService fieldsMapperService(ConversionService conversionService) {
-        DefaultFieldsMapperService bean = new DefaultFieldsMapperService(Mockito.mock(BeanFactory.class),
-                conversionService);
-        bean.sort();
-        return bean;
+    public FormMapper formMapper(FieldsMapperService fieldsMapperService) {
+        return new DefaultFormMapper(fieldsMapperService);
     }
 
     @Bean("formularTestSpecification")

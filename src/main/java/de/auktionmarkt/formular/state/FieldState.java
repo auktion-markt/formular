@@ -43,8 +43,8 @@ public class FieldState {
      * Constructs a new {@code FieldState}. The constructor will validate the given {@code value} (include walking over
      * a {@link Collection} and check each element).
      *
-     * @param value The form value of the field (must be either {@code null}, a {@link String} or an instance of
-     *              {@link Collection}.
+     * @param value The form value of the field (must be either {@code null}, a {@link String}, a {@code boolean} or
+     *              an instance of {@link Collection}.
      * @param errors A {@link Collection} of errors
      * @throws NullPointerException Is thrown when {@code errors} is {@code null}
      * @throws IllegalArgumentException Is thrown when {@code value} is not {@code null} and not an {@link String} or
@@ -57,9 +57,28 @@ public class FieldState {
         this.errors = Collections.unmodifiableList(new ArrayList<>(errors));
     }
 
+    // Utility method for use in templates
+    @SuppressWarnings("unused")
+    public boolean valueContains(String value) {
+        if (this.value instanceof Collection<?>)
+            return ((Collection) this.value).contains(value);
+        else if (this.value instanceof String)
+            return value.isEmpty() || value.equals(this.value);
+        return false;
+    }
+
+    // Utility method for use in templates
+    @SuppressWarnings("unused")
+    public boolean isChecked() {
+        return this.value instanceof Boolean && (Boolean) this.value;
+    }
+
     private static void validateValue(Object value) {
-        if (value != null && !(value instanceof String) && !(value instanceof Collection))
-            throw new IllegalArgumentException("value must be either null, a string or a collection but is " + value);
+        if (value != null && !(value instanceof String) && !(value instanceof Collection) &&
+                !(value instanceof Boolean)) {
+            throw new IllegalArgumentException("value must be either null, a string, a boolean or " +
+                    "a collection but is " + value);
+        }
         if (value instanceof Collection) {
             for (Object o : (Collection) value) {
                 if (o == null)

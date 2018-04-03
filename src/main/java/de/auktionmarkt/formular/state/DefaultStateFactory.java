@@ -48,18 +48,18 @@ public class DefaultStateFactory implements StateFactory {
     }
 
     /**
-     * Creates a field state mapping for each field in {@link FormSpecification#fields} with a corresponding value
-     * {@link FieldState#EMPTY}.
+     * Creates a field state mapping for each field in {@link FormSpecification#fields} with a empty value.
      *
      * @param formSpecification The {@link FormSpecification} from which the fields will be obtained
-     * @return An unordered {@link Map} consisting of field names as keys and {@link FieldState#EMPTY} as value
+     * @return An unordered {@link Map} consisting of field names as keys and empty value (not {@code null})
      */
     @Override
     public FormState createEmptyState(FormSpecification formSpecification) {
         Objects.requireNonNull(formSpecification, "formSpecification must not be null");
         Map<String, FieldState> fieldStates = Collections.unmodifiableMap(
-                formSpecification.getFields().keySet().stream()
-                        .collect(Collectors.toMap(s -> s, s -> FieldState.EMPTY)));
+                formSpecification.getFields().values().stream()
+                        .collect(Collectors.toMap(FieldSpecification::getPath, s ->
+                                new FieldState(createDefaultValue(s), Collections.emptySet()))));
         return new FormState(false, fieldStates);
     }
 
@@ -111,7 +111,21 @@ public class DefaultStateFactory implements StateFactory {
     }
 
     private static TypeDescriptor decideTypeDescriptor(TypeDescriptor original) {
-        return original.isCollection() || original.isArray() ?
-                TypeDescriptors.STRING_LIST : TypeDescriptors.STRING_TYPE;
+        if (original.isCollection() || original.isArray())
+            return TypeDescriptors.STRING_LIST;
+        else if (TypeDescriptors.BOOLEAN_TYPE.equals(original))
+            return TypeDescriptors.BOOLEAN_TYPE;
+        else if (TypeDescriptors.BOOLEAN_PRIMITIVE.equals(original))
+            return TypeDescriptors.BOOLEAN_PRIMITIVE;
+        return TypeDescriptors.STRING_TYPE;
+    }
+
+    private static Object createDefaultValue(FieldSpecification fieldSpecification) {
+        TypeDescriptor type = decideTypeDescriptor(fieldSpecification.getTypeDescriptor());
+        if (type.isCollection() || type.isArray())
+            return Collections.emptySet();
+        else if (TypeDescriptors.BOOLEAN_TYPE.equals(type) || TypeDescriptors.BOOLEAN_PRIMITIVE.equals(type))
+            return false;
+        return "";
     }
 }

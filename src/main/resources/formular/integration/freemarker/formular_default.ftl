@@ -21,10 +21,12 @@
             <@render_input_field form_specification field_specification form_state field_state/>
             <#break>
         <#case 'checkbox'>
+            <@render_checkbox form_specification field_specification form_state field_state/>
             <#break>
         <#case 'radio'>
             <#break>
         <#case 'select'>
+            <@render_selector form_specification field_specification form_state field_state/>
             <#break>
     </#switch>
 </#macro>
@@ -45,17 +47,29 @@
     </#if>
 </#macro>
 
-<#--
+
 <#macro render_checkbox form_specification field_specification form_state field_state>
     <label for="${field_specification.path}">
         <@compress single_line=true><input type="checkbox"
             id="${field_specification.path}"
             name="${field_specification.path}"
+            <#if field_state.isChecked()>checked</#if>
             <#if (field_specification.parameters.required)?? && field_specification.parameters.required == true>required</#if>>
-        ${field_specification.label}
+        ${field_specification.label}</@compress>
     </label>
     <#if field_state.errors?has_content>
         <span class="form-errors">Errors on this field: <#list field_state.errors as error>${error}<#sep>, </#list></span>
     </#if>
 </#macro>
--->
+
+<#macro render_selector form_specification field_specification form_state field_state>
+    <label for="${field_specification.path}">${field_specification.label}</label>
+    <select id="${field_specification.path}" name="${field_specification.path}">
+        <#list field_specification.valuesSupplier.get() as value, label>
+            <option value="${value}" <#if field_state.valueContains(value)>selected</#if>>${label}</option>
+        </#list>
+    </select>
+    <#if field_state.errors?has_content>
+        <span class="form-errors">Errors on this field: <#list field_state.errors as error>${error}<#sep>, </#list></span>
+    </#if>
+</#macro>

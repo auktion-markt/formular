@@ -24,6 +24,7 @@ import lombok.Data;
 
 import javax.validation.constraints.Max;
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 @Data
 class TestForm {
@@ -48,6 +49,14 @@ class TestForm {
     @FormElement
     @FormInput(label = "<<label for aString>>")
     private String aString;
+
+    @FormElement
+    @FormInput(label = "<<label for checkbox>>")
+    private Boolean checkbox;
+
+    @FormElement
+    @FormInput(label = "<<label for singleSelected>>")
+    private TimeUnit singleSelected;
 
     @FormElement
     @FormEmbedded(title = "<<title for embeddedForm>>")
