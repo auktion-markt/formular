@@ -28,5 +28,6 @@ public class DefaultFieldsMapperService extends GenericFieldsMapperService {
                 new EnumFieldsMapper(beanFactory, conversionService),
                 new NestedFieldsMapper(beanFactory)
         );
+        sort();
     }
 }
