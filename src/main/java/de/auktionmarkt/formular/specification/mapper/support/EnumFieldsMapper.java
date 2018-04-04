@@ -49,10 +49,9 @@ public class EnumFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     @Override
     public boolean supportsField(Class<?> model, PropertyDescriptor propertyDescriptor, TypeDescriptor typeDescriptor) {
-        if (!super.supportsField(model, propertyDescriptor, typeDescriptor))
-            return false;
         Class<?> elementType = FieldMapperUtils.unpackType(typeDescriptor);
-        return elementType != null && elementType.isEnum();
+        return elementType != null && elementType.isEnum() &&
+                super.supportsField(model, propertyDescriptor, typeDescriptor);
     }
 
     @SuppressWarnings("unchecked")

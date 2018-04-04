@@ -16,9 +16,9 @@
 
 package de.auktionmarkt.formular.specification.mapper.support;
 
-import de.auktionmarkt.formular.internal.CollectionUtils;
 import de.auktionmarkt.formular.specification.FieldSpecification;
 import de.auktionmarkt.formular.specification.FieldTypes;
+import de.auktionmarkt.formular.specification.annotation.EntityReference;
 import de.auktionmarkt.formular.specification.annotation.FormInput;
 import de.auktionmarkt.formular.specification.annotation.JpaValuesByRepositoryMethod;
 import de.auktionmarkt.formular.specification.mapper.AbstractAnnotatedInputFieldsMapper;
@@ -32,18 +32,15 @@ import org.springframework.cglib.reflect.FastClass;
 import org.springframework.cglib.reflect.FastMethod;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.support.Repositories;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.CollectionAttribute;
-import javax.persistence.metamodel.ManagedType;
-import javax.persistence.metamodel.Metamodel;
-import javax.persistence.metamodel.SingularAttribute;
-import javax.persistence.metamodel.Type;
+import javax.persistence.PersistenceUnitUtil;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.beans.PropertyDescriptor;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,8 +48,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -63,13 +58,7 @@ import java.util.function.Supplier;
  * spring-data repository information and primary keys is get from {@link Repositories}. Entity-to-string and
  * primary-key-to-string conversion is done using the global conversion service.
  */
-// ToDo: Maybe support for MapAttributes
 public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
-
-    private static final Set<Attribute.PersistentAttributeType> SUPPORTED_PERSISTENCE_ATTRIBUTE_TYPES =
-            CollectionUtils.warpImmutableSet(Attribute.PersistentAttributeType.MANY_TO_MANY,
-                    Attribute.PersistentAttributeType.MANY_TO_ONE, Attribute.PersistentAttributeType.ONE_TO_MANY,
-                    Attribute.PersistentAttributeType.ONE_TO_ONE);
 
     private final EntityManagerFactory entityManagerFactory;
     private final BeanFactory beanFactory;
@@ -85,50 +74,42 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     @Override
     public boolean supportsField(Class<?> model, PropertyDescriptor propertyDescriptor, TypeDescriptor typeDescriptor) {
-        // Check if this field qualifies as a form field
-        if (!super.supportsField(model, propertyDescriptor, typeDescriptor))
-            return false;
-        Attribute<?, ?> attribute = getAttribute(model, propertyDescriptor);
-        // Only mapped entities are supported
-        if (attribute == null)
-            return false;
-        Attribute.PersistentAttributeType persistentAttributeType = attribute.getPersistentAttributeType();
-        // Only associations are supported; a supported selector annotation (@JpaValuesByRepositoryMethod) is required
-        if (!SUPPORTED_PERSISTENCE_ATTRIBUTE_TYPES.contains(persistentAttributeType) ||
-                (!typeDescriptor.hasAnnotation(JpaValuesByRepositoryMethod.class))) {
-            return false;
-        }
-        Type.PersistenceType persistenceType = null;
-        if (attribute instanceof CollectionAttribute)
-            persistenceType = ((CollectionAttribute) attribute).getElementType().getPersistenceType();
-        else if (attribute instanceof SingularAttribute)
-            persistenceType = ((SingularAttribute) attribute).getType().getPersistenceType();
-        return persistenceType == Type.PersistenceType.ENTITY;
+        System.out.println("Property asd " + propertyDescriptor.getName() + ": " + typeDescriptor.hasAnnotation(EntityReference.class) + " "  + super.supportsField(model, propertyDescriptor, typeDescriptor));
+        return typeDescriptor.hasAnnotation(EntityReference.class) &&
+                super.supportsField(model, propertyDescriptor, typeDescriptor);
     }
 
     @Override
     public Collection<FieldSpecification> mapFieldSpecification(FormMapper callingFormMapper, Class<?> model,
                                                                 PropertyDescriptor propertyDescriptor,
                                                                 TypeDescriptor typeDescriptor) {
-        Metamodel metamodel = entityManagerFactory.getMetamodel();
-        ManagedType<?> managedType = metamodel.managedType(model);
-        Attribute<?, ?> attribute = managedType.getAttribute(propertyDescriptor.getName());
-        Objects.requireNonNull(attribute, "Attribute not available");
+        EntityReference entityReference = typeDescriptor.getAnnotation(EntityReference.class);
+        Class<?> entityClass = entityReference.entityClass();
+        if (entityClass == void.class) {
+            if (typeDescriptor.isCollection()) {
+                entityClass = typeDescriptor.getType();
+            } else {
+                TypeDescriptor elementTypeDescriptor = typeDescriptor.getElementTypeDescriptor();
+                if (elementTypeDescriptor == null) {
+                    throw new FormMappingException("Cannot determine entity reference type. Specify " +
+                            "@EntityReference(entityClass = YourEntity.class) or parameterize collection");
+                }
+                entityClass = elementTypeDescriptor.getType();
+            }
+        }
 
         Supplier<? extends Iterable<?>> rawValueSupplier;
-        JpaValuesByRepositoryMethod jpaValuesByRepositoryMethod = typeDescriptor
-                .getAnnotation(JpaValuesByRepositoryMethod.class);
-        Class<?> entityType = getEntityType(attribute);
-        if (jpaValuesByRepositoryMethod != null) {
-            rawValueSupplier = getRepositorySupplier(entityType, model, propertyDescriptor,
-                    typeDescriptor, jpaValuesByRepositoryMethod);
+        if (typeDescriptor.hasAnnotation(JpaValuesByRepositoryMethod.class)) {
+            JpaValuesByRepositoryMethod supplierConfig =
+                    typeDescriptor.getAnnotation(JpaValuesByRepositoryMethod.class);
+            rawValueSupplier = getRepositorySupplier(entityClass, model, propertyDescriptor, typeDescriptor, supplierConfig);
         } else {
-            throw new UnsupportedOperationException("Cannot determine value supplier");
+            rawValueSupplier = getFindAllSupplier(entityClass);
         }
         String type = typeDescriptor.getAnnotation(FormInput.class).type();
         if (type.isEmpty())
             type = typeDescriptor.isCollection() ? FieldTypes.CHECKBOX : FieldTypes.SELECT;
-        Supplier<Map<String, String>> valueSupplier = valueSupplier(entityType, rawValueSupplier);
+        Supplier<Map<String, String>> valueSupplier = valueSupplier(entityClass, rawValueSupplier);
         return Collections.singleton(prepareMapFieldSpecification(propertyDescriptor, typeDescriptor)
                 .valuesSupplier(valueSupplier)
                 .type(type)
@@ -175,15 +156,16 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
         };
     }
 
-    private Attribute<?, ?> getAttribute(Class<?> model, PropertyDescriptor propertyDescriptor) {
-        Metamodel metamodel = entityManagerFactory.getMetamodel();
-        ManagedType<?> managedType = metamodel.managedType(model);
-        if (managedType == null)
-            return null;
-        Attribute<?, ?> attribute = managedType.getAttribute(propertyDescriptor.getName());
-        if (attribute == null)
-            return null;
-        return attribute;
+    private Supplier<? extends Iterable<?>> getFindAllSupplier(Class<?> entityType) {
+        return () -> {
+            EntityManager em = entityManagerFactory.createEntityManager();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<?> cq = cb.createQuery(entityType);
+            TypedQuery<?> query = em.createQuery(cq);
+            return query.getResultList();
+            // Entity manager should remain in a open-state to allows fetching references. Maybe close entity manager
+            // when entity graphs are supported
+        };
     }
 
     /**
@@ -197,29 +179,17 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
             Iterator<?> iterator = iterable.get().iterator();
             if (!iterator.hasNext())
                 return Collections.emptyMap();
-            EntityInformation entityInformation = repositories.getEntityInformationFor(entityType);
+            PersistenceUnitUtil persistenceUnitUtil = entityManagerFactory.getPersistenceUnitUtil();
             Map<String, String> result = new HashMap<>();
             do {
                 Object instance = iterator.next();
-                Serializable id = entityInformation.getId(instance);
+                Object id = persistenceUnitUtil.getIdentifier(instance);
                 String key = conversionService.convert(id, String.class);
                 String displayValue = conversionService.convert(instance, String.class);
                 result.put(key, displayValue);
             } while(iterator.hasNext());
             return result;
         };
-    }
-
-    /**
-     * Extracts the entity type ot of an attribute.
-     */
-    private static Class<?> getEntityType(Attribute<?, ?> attribute) {
-        if (!SUPPORTED_PERSISTENCE_ATTRIBUTE_TYPES.contains(attribute.getPersistentAttributeType())) {
-            throw new UnsupportedOperationException("Unsupported PersistentAttributeType: " +
-                    attribute.getPersistentAttributeType());
-        }
-        return attribute instanceof CollectionAttribute ?
-                ((CollectionAttribute) attribute).getElementType().getJavaType() : attribute.getJavaType();
     }
 
     /**

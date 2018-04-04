@@ -41,11 +41,10 @@ public class DateFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     @Override
     public boolean supportsField(Class<?> model, PropertyDescriptor propertyDescriptor, TypeDescriptor typeDescriptor) {
-        if (!super.supportsField(model, propertyDescriptor, typeDescriptor))
-            return false;
         Class<?> type = typeDescriptor.getType();
-        return Date.class.isAssignableFrom(type) || LocalDateTime.class.isAssignableFrom(type) ||
-                LocalTime.class.isAssignableFrom(type) || LocalDate.class.isAssignableFrom(type);
+        return (Date.class.isAssignableFrom(type) || LocalDateTime.class.isAssignableFrom(type) ||
+                LocalTime.class.isAssignableFrom(type) || LocalDate.class.isAssignableFrom(type)) &&
+                super.supportsField(model, propertyDescriptor, typeDescriptor);
     }
 
     @Override

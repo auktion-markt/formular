@@ -16,14 +16,21 @@
 
 package de.auktionmarkt.formular.integration;
 
+import de.auktionmarkt.formular.internal.configuration.DataJpaAutoConfiguration;
 import de.auktionmarkt.formular.configuration.FormularAutoConfiguration;
 import de.auktionmarkt.formular.configuration.FormularConfiguration;
+import de.auktionmarkt.formular.internal.configuration.Finisher;
+import de.auktionmarkt.formular.specification.mapper.FormMapper;
 import de.auktionmarkt.formular.test.CustomMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -36,20 +43,42 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @EnableWebMvc
-@SpringBootTest(classes = {TestBeans.class, TestController.class, FormularAutoConfiguration.class,
-        FormularConfiguration.class, FreemarkerIntegration.class, FreeMarkerAutoConfiguration.class})
+@DataJpaTest
+@AutoConfigureTestDatabase
+@EnableAutoConfiguration
+@SpringBootTest(classes = {TestController.class, FormularAutoConfiguration.class, DataJpaAutoConfiguration.class,
+        Finisher.class, FormularConfiguration.class, FreemarkerIntegration.class, FreeMarkerAutoConfiguration.class,
+        TestBeans.class})
 public class FormIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Autowired
+    private FormMapper formMapper;
+
     @Test
     public void test() throws Exception {
+        System.out.println(formMapper.mapFormSpecification(TestForm.class, "post", "/test"));
+
+        // Insert into database
+        TestChoosableEntity entity = new TestChoosableEntity();
+        entity.setDisplayValue("The first chooseable test entity");
+        entityManager.persist(entity);
+        entity = new TestChoosableEntity();
+        entity.setDisplayValue("The second chooseable test entity");
+        entityManager.persist(entity);
+
         // Check general form creation
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/test_form");
         mockMvc.perform(requestBuilder)
@@ -64,6 +93,8 @@ public class FormIntegrationTest {
 
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<label for singleSelected>>")))
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<label for multiSelected>>")))
+                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<label for entitySingleSelected>>")))
+                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<label for entityMultiSelected>>")))
 
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<<label for checkbox>>")));
 
@@ -78,7 +109,10 @@ public class FormIntegrationTest {
         // Check "real" submit
         requestBuilder = MockMvcRequestBuilders.post("/test_form")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content("requiredInt=42&optionalInt=12&AString=HelloImTheValueOfAString&embeddedForm.anotherString=TheValueOfAnotherTestString&checkbox=on&singleSelected=MINUTES&multiSelected=DISPLAY&multiSelected=FORMAT");
+                .content("requiredInt=42&optionalInt=12&AString=HelloImTheValueOfAString&" +
+                        "embeddedForm.anotherString=TheValueOfAnotherTestString&checkbox=on&" +
+                        "singleSelected=MINUTES&multiSelected=DISPLAY&multiSelected=FORMAT&" +
+                        "entitySingleSelected=1&entityMultiSelected=1&entityMultiSelected=2");
         mockMvc.perform(requestBuilder)
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("<p>successs</p>")));

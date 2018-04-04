@@ -46,4 +46,5 @@ components.
 
  * Better testing
  * More usage examples
- * Support for nested forms
+ * Support for retrieving entities with entity graphs
+ * Support for map attributes

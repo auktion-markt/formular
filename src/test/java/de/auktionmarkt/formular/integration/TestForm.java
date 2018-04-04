@@ -17,6 +17,7 @@
 package de.auktionmarkt.formular.integration;
 
 import de.auktionmarkt.formular.specification.FieldTypes;
+import de.auktionmarkt.formular.specification.annotation.EntityReference;
 import de.auktionmarkt.formular.specification.annotation.FormElement;
 import de.auktionmarkt.formular.specification.annotation.FormEmbedded;
 import de.auktionmarkt.formular.specification.annotation.FormInput;
@@ -63,6 +64,16 @@ class TestForm {
     @FormElement
     @FormInput(label = "<<label for multiSelected>>", elementType = Locale.Category.class)
     private Set<Locale.Category> multiSelected;
+
+    @FormElement
+    @FormInput(label = "<<label for entitySingleSelected>>")
+    @EntityReference
+    private TestChoosableEntity entitySingleSelected;
+
+    @FormElement
+    @FormInput(label = "<<label for entityMultiSelected>>")
+    @EntityReference
+    private Set<TestChoosableEntity> entityMultiSelected;
 
     @FormElement
     @FormEmbedded(title = "<<title for embeddedForm>>")

@@ -76,8 +76,8 @@ public class BasicFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     @Override
     public boolean supportsField(Class<?> model, PropertyDescriptor propertyDescriptor, TypeDescriptor typeDescriptor) {
-        return super.supportsField(model, propertyDescriptor, typeDescriptor) &&
-                CONFIGURER.containsKey(typeDescriptor.getType());
+        return CONFIGURER.containsKey(typeDescriptor.getType()) &&
+                super.supportsField(model, propertyDescriptor, typeDescriptor);
     }
 
     @Override
