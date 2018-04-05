@@ -17,10 +17,11 @@
 package de.auktionmarkt.formular.integration;
 
 import de.auktionmarkt.formular.specification.FormSpecification;
+import de.auktionmarkt.formular.specification.mapper.FormMapper;
 import de.auktionmarkt.formular.state.FormState;
 import de.auktionmarkt.formular.state.StateFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,18 +35,18 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TestController {
 
     private final AtomicReference<TestForm> form = new AtomicReference<>();
-    private final FormSpecification formSpecification;
+    private final FormMapper formMapper;
     private final StateFactory stateFactory;
 
     @Autowired
-    public TestController(@Qualifier("formularTestSpecification") FormSpecification formSpecification,
-                          StateFactory stateFactory) {
-        this.formSpecification = formSpecification;
+    public TestController(FormMapper formMapper, StateFactory stateFactory) {
+        this.formMapper = formMapper;
         this.stateFactory = stateFactory;
     }
 
     @GetMapping("/test_form")
     public Object get(Model model) {
+        FormSpecification formSpecification = formMapper.mapFormSpecification(TestForm.class, "post", "/test");
         model.addAttribute("form_specification", formSpecification);
         TestForm previous = form.get();
         FormState formState = previous != null ?
@@ -58,6 +59,7 @@ public class TestController {
 
     @PostMapping("/test_form")
     public String post(@Valid TestForm form, BindingResult bindingResult, Model model) {
+        FormSpecification formSpecification = formMapper.mapFormSpecification(TestForm.class, "post", "/test");
         if (bindingResult.hasErrors()) {
             model.addAttribute("form_specification", formSpecification);
             model.addAttribute("available", false);

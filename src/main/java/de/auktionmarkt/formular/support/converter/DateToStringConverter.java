@@ -59,6 +59,8 @@ public class DateToStringConverter implements ConditionalGenericConverter {
 
     @Override
     public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+        if (source == null)
+            return null;
         Class<?> type = sourceType.getType();
         ZoneId zoneId = LocaleContextHolder.getTimeZone().toZoneId();
         if (type.isAssignableFrom(LocalDate.class))

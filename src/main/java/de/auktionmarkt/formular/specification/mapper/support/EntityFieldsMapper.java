@@ -40,6 +40,7 @@ import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -87,14 +88,14 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
         Class<?> entityClass = entityReference.entityClass();
         if (entityClass == void.class) {
             if (typeDescriptor.isCollection()) {
-                entityClass = typeDescriptor.getType();
-            } else {
                 TypeDescriptor elementTypeDescriptor = typeDescriptor.getElementTypeDescriptor();
                 if (elementTypeDescriptor == null) {
                     throw new FormMappingException("Cannot determine entity reference type. Specify " +
                             "@EntityReference(entityClass = YourEntity.class) or parameterize collection");
                 }
                 entityClass = elementTypeDescriptor.getType();
+            } else {
+                entityClass = typeDescriptor.getType();
             }
         }
 
@@ -156,11 +157,13 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
         };
     }
 
-    private Supplier<? extends Iterable<?>> getFindAllSupplier(Class<?> entityType) {
+    private <T> Supplier<? extends Iterable<?>> getFindAllSupplier(Class<T> entityType) {
         return () -> {
             EntityManager em = entityManagerFactory.createEntityManager();
             CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<?> cq = cb.createQuery(entityType);
+            CriteriaQuery<T> cq = cb.createQuery(entityType);
+            Root<T> root = cq.from(entityType);
+            cq = cq.select(root);
             TypedQuery<?> query = em.createQuery(cq);
             return query.getResultList();
             // Entity manager should remain in a open-state to allows fetching references. Maybe close entity manager

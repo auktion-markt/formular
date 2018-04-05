@@ -17,39 +17,21 @@
 package de.auktionmarkt.formular.integration;
 
 import de.auktionmarkt.formular.internal.configuration.Finisher;
-import de.auktionmarkt.formular.specification.FormSpecification;
 import de.auktionmarkt.formular.specification.mapper.FormMapper;
+import de.auktionmarkt.formular.specification.mapper.support.CachedFormMapper;
 import de.auktionmarkt.formular.specification.mapper.support.DefaultFormMapper;
-import de.auktionmarkt.formular.support.converter.DateToStringConverter;
-import de.auktionmarkt.formular.support.converter.StringToDateConverter;
 import de.auktionmarkt.formular.specification.mapper.FieldsMapperService;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.ConfigurableConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 
 @Configuration
 @AutoConfigureAfter(Finisher.class)
-class TestBeans {
-
-    @Bean
-    public ConversionService conversionService() {
-        ConfigurableConversionService bean = new DefaultConversionService();
-        bean.addConverter(new DateToStringConverter());
-        bean.addConverter(new StringToDateConverter());
-        return bean;
-    }
+public class TestBeans {
 
     @Bean
     public FormMapper formMapper(FieldsMapperService fieldsMapperService) {
-        return new DefaultFormMapper(fieldsMapperService);
-    }
-
-    @Bean("formularTestSpecification")
-    public FormSpecification formSpecification(FormMapper formMapper) {
-        return null;
-        //return formMapper.mapFormSpecification(TestForm.class, "post", "/test");
+        // ToDo: Encapsulate in autoconfiguration
+        return new CachedFormMapper(new DefaultFormMapper(fieldsMapperService));
     }
 }
