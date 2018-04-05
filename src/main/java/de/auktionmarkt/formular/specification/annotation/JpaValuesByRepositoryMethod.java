@@ -16,8 +16,6 @@
 
 package de.auktionmarkt.formular.specification.annotation;
 
-import de.auktionmarkt.formular.specification.support.RepositoryParameterFiller;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

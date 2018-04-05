@@ -25,6 +25,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Some collection-related internal utilities.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CollectionUtils {
 

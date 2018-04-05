@@ -21,9 +21,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotates a form element.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface FormElement {
 
+    /**
+     * Returns the order of the element. Elements will be sorted ascending.
+     *
+     * @return The order of the element
+     */
     int order() default 0;
 }

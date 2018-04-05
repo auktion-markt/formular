@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * Automatically sorts {@link GenericFieldsMapperService} when a instance is available as a bean.
+ */
 @Configuration
 @ConditionalOnBean(GenericFieldsMapperService.class)
 public class Finisher {

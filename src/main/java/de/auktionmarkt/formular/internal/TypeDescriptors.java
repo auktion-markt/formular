@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Shared commonly used {@link TypeDescriptor}s.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TypeDescriptors {
 

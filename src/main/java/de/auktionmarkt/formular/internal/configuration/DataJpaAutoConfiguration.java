@@ -17,6 +17,9 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 
+/**
+ * Registers {@link EntityFieldsMapper} when {@code spring-data-jpa} is available.
+ */
 @Configuration
 @ConditionalOnClass(LocalContainerEntityManagerFactoryBean.class)
 @AutoConfigureBefore(Finisher.class)

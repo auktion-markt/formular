@@ -21,11 +21,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotates an embedded form. The referenced class will be mapped and their fields inserted into the form.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface FormEmbedded {
 
+    /**
+     * Returns the title of the embedded form.
+     *
+     * @return The title of the embedded form
+     */
     String title() default "";
 
+    /**
+     * Returns the name of a bean implementing {@link java.util.function.Supplier} and supplies a {@link String}.
+     *
+     * @return The name of a title supplier bean
+     */
     String titleSupplierBean() default "";
 }
