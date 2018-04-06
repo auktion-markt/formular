@@ -25,6 +25,8 @@ import de.auktionmarkt.formular.specification.mapper.support.DefaultFormMapper;
 import de.auktionmarkt.formular.specification.mapper.support.GenericFieldsMapperService;
 import de.auktionmarkt.formular.state.DefaultStateFactory;
 import de.auktionmarkt.formular.state.StateFactory;
+import de.auktionmarkt.formular.state.applicator.DefaultFormStateApplicator;
+import de.auktionmarkt.formular.state.applicator.FormStateApplicator;
 import de.auktionmarkt.formular.support.converter.DateToStringConverter;
 import de.auktionmarkt.formular.support.converter.StringToDateConverter;
 import org.slf4j.Logger;
@@ -73,6 +75,12 @@ public class FormularAutoConfiguration {
     @ConditionalOnMissingBean(StateFactory.class)
     public StateFactory stateFactory(MessageSource messageSource, ConversionService conversionService) {
         return new DefaultStateFactory(messageSource, conversionService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(FormStateApplicator.class)
+    public FormStateApplicator formStateApplicator(ConversionService conversionService) {
+        return new DefaultFormStateApplicator(conversionService);
     }
 
     @Configuration

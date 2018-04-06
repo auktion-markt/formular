@@ -48,3 +48,4 @@ components.
  * More usage examples
  * Support for retrieving entities with entity graphs
  * Support for map attributes
+ * Test for `DefaultFormStateApplicator`
