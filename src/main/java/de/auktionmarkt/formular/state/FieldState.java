@@ -34,9 +34,10 @@ public class FieldState {
     /**
      * Instance of {@code FieldState} with no value and no errors set.
      */
-    public static final FieldState EMPTY = new FieldState("", Collections.emptyList());
+    public static final FieldState EMPTY = new FieldState("", false, Collections.emptyList());
 
     private final Object value;
+    private final boolean valueSet;
     private final List<String> errors;
 
     /**
@@ -50,9 +51,10 @@ public class FieldState {
      * @throws IllegalArgumentException Is thrown when {@code value} is not {@code null} and not an {@link String} or
      *                                  an instance of {@link Collection}
      */
-    public FieldState(Object value, Collection<String> errors) {
+    public FieldState(Object value, boolean valueSet, Collection<String> errors) {
         validateValue(value);
         this.value = value;
+        this.valueSet = valueSet;
         Objects.requireNonNull(errors, "errors must not be null");
         this.errors = Collections.unmodifiableList(new ArrayList<>(errors));
     }

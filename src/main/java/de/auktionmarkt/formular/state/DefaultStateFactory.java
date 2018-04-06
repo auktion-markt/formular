@@ -59,7 +59,7 @@ public class DefaultStateFactory implements StateFactory {
         Map<String, FieldState> fieldStates = Collections.unmodifiableMap(
                 formSpecification.getFields().values().stream()
                         .collect(Collectors.toMap(FieldSpecification::getPath, s ->
-                                new FieldState(createDefaultValue(s), Collections.emptySet()))));
+                                new FieldState(createDefaultValue(s), false, Collections.emptySet()))));
         return new FormState(false, fieldStates);
     }
 
@@ -73,9 +73,16 @@ public class DefaultStateFactory implements StateFactory {
         // Prevent throwing org.springframework.beans.NullValueInNestedPathException on unset property
         modelWrapper.setAutoGrowNestedPaths(true);
         for (FieldSpecification fieldSpecification : fieldSpecificationMap.values()) {
-            Object value = modelWrapper.getPropertyValue(fieldSpecification.getPath());
-            value = convertWhenNecessary(value);
-            FieldState fieldState = new FieldState(value, Collections.emptyList());
+            String path = fieldSpecification.getPath();
+            boolean hasProperty = modelWrapper.isReadableProperty(path);
+            FieldState fieldState;
+            if (hasProperty) {
+                Object value = modelWrapper.getPropertyValue(fieldSpecification.getPath());
+                value = convertWhenNecessary(value);
+                fieldState = new FieldState(value, true, Collections.emptyList());
+            } else {
+                fieldState = new FieldState(createDefaultValue(fieldSpecification), false, Collections.emptyList());
+            }
             fieldStates.put(fieldSpecification.getPath(), fieldState);
         }
         fieldStates = Collections.unmodifiableMap(fieldStates);
@@ -89,12 +96,19 @@ public class DefaultStateFactory implements StateFactory {
         Map<String, FieldSpecification> fieldSpecificationMap = formSpecification.getFields();
         Map<String, FieldState> fieldStates = new HashMap<>(fieldSpecificationMap.size());
         for (FieldSpecification fieldSpecification : fieldSpecificationMap.values()) {
-            List<String> fieldErrors = bindingResult.getFieldErrors().stream()
-                    .map(error -> messageSource.getMessage(error, LocaleContextHolder.getLocale()))
-                    .collect(Collectors.toList());
-            Object value = bindingResult.getFieldValue(fieldSpecification.getPath());
-            value = convertWhenNecessary(value);
-            FieldState fieldState = new FieldState(value, fieldErrors);
+            String path = fieldSpecification.getPath();
+            boolean isSet = bindingResult.getRawFieldValue(path) != null;
+            FieldState fieldState;
+            if (isSet) {
+                List<String> fieldErrors = bindingResult.getFieldErrors().stream()
+                        .map(error -> messageSource.getMessage(error, LocaleContextHolder.getLocale()))
+                        .collect(Collectors.toList());
+                Object value = bindingResult.getFieldValue(fieldSpecification.getPath());
+                value = convertWhenNecessary(value);
+                fieldState = new FieldState(value, true, fieldErrors);
+            } else {
+                fieldState = new FieldState(createDefaultValue(fieldSpecification), false, Collections.emptyList());
+            }
             fieldStates.put(fieldSpecification.getPath(), fieldState);
         }
         fieldStates = Collections.unmodifiableMap(fieldStates);

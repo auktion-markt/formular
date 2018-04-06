@@ -67,8 +67,6 @@ public class FormIntegrationTest {
 
     @Test
     public void test() throws Exception {
-        FormSpecification formSpecification = formMapper.mapFormSpecification(TestForm.class, "post", "/test");
-
         // Insert into database
         TestChoosableEntity entity = new TestChoosableEntity();
         entity.setDisplayValue("The first chooseable test entity");
