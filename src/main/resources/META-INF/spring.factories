@@ -1,5 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-de.auktionmarkt.formular.configuration.FormularAutoConfiguration,\
-de.auktionmarkt.formular.internal.configuration.DataJpaAutoConfiguration,\
-de.auktionmarkt.formular.internal.configuration.Finisher,\
-de.auktionmarkt.formular.integration.freemarker.FreemarkerIntegration
