@@ -18,10 +18,12 @@ package de.auktionmarkt.formular.configuration;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration model for Formular.
  */
+@Configuration
 @ConfigurationProperties(prefix = "formular")
 @Data
 public class FormularConfiguration {
