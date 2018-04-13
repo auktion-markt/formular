@@ -106,10 +106,11 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
         } else {
             rawValueSupplier = getFindAllSupplier(entityClass);
         }
-        String type = typeDescriptor.getAnnotation(FormInput.class).type();
+        FormInput formInput = typeDescriptor.getAnnotation(FormInput.class);
+        String type = formInput.type();
         if (type.isEmpty())
             type = typeDescriptor.isCollection() ? FieldTypes.CHECKBOX : FieldTypes.SELECT;
-        Supplier<Map<String, String>> valueSupplier = valueSupplier(entityClass, rawValueSupplier);
+        Supplier<Map<String, String>> valueSupplier = valueSupplier(formInput.required(), rawValueSupplier);
         return Collections.singleton(prepareMapFieldSpecification(propertyDescriptor, typeDescriptor)
                 .valuesSupplier(valueSupplier)
                 .type(type)
@@ -175,14 +176,15 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
      * a {@link Map}&lte;{@link String}, {@link String}&gte;.
      */
     @SuppressWarnings("unchecked")
-    private Supplier<Map<String, String>> valueSupplier(Class<?> entityType,
-                                                        Supplier<? extends Iterable<?>> iterable) {
+    private Supplier<Map<String, String>> valueSupplier(boolean required, Supplier<? extends Iterable<?>> iterable) {
         return () -> {
             Iterator<?> iterator = iterable.get().iterator();
             if (!iterator.hasNext())
                 return Collections.emptyMap();
             PersistenceUnitUtil persistenceUnitUtil = entityManagerFactory.getPersistenceUnitUtil();
             Map<String, String> result = new HashMap<>();
+            if (!required)
+                result.put("", "");
             do {
                 Object instance = iterator.next();
                 Object id = persistenceUnitUtil.getIdentifier(instance);

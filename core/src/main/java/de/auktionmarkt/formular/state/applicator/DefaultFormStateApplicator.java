@@ -24,6 +24,8 @@ public class DefaultFormStateApplicator implements FormStateApplicator {
             if (!fieldState.getValue().isValueSet())
                 continue;
             String path = fieldState.getKey();
+            if (path.isEmpty())
+                continue;
             TypeDescriptor propertyTypeDescriptor = wrapper.getPropertyTypeDescriptor(path);
             if (propertyTypeDescriptor == null && !ignoreInvalid)
                 throw new IllegalArgumentException("Missing property: " + path);
