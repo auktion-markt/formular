@@ -8,32 +8,34 @@
 
 <#macro render_field form_specification field_specification form_state field_state>
     <#if (field_specification.parameters.titleSupplier)??><h3>${field_specification.parameters.titleSupplier.get()}</h3></#if>
-    <#switch field_specification.type>
-        <#case 'text'>
-        <#case 'password'>
-        <#case 'number'>
-        <#case 'email'>
-        <#case 'tel'>
-        <#case 'url'>
-        <#case 'date'>
-        <#case 'datetime-local'>
-        <#case 'time'>
-            <@render_input_field form_specification field_specification form_state field_state/>
-            <#break>
-        <#case 'checkbox'>
-            <@render_checkbox form_specification field_specification form_state field_state/>
-            <#break>
-        <#case 'radio'>
-            <#break>
-        <#case 'select'>
-            <@render_selector form_specification field_specification form_state field_state/>
-            <#break>
-        <#case 'button'>
-        <#case 'submit'>
-        <#case 'cancel'>
-            <@render_button form_specification field_specification form_state field_state/>
-            <#break>
-    </#switch>
+    <div>
+        <#switch field_specification.type>
+            <#case 'text'>
+            <#case 'password'>
+            <#case 'number'>
+            <#case 'email'>
+            <#case 'tel'>
+            <#case 'url'>
+            <#case 'date'>
+            <#case 'datetime-local'>
+            <#case 'time'>
+                <@render_input_field form_specification field_specification form_state field_state/>
+                <#break>
+            <#case 'checkbox'>
+                <@render_checkbox form_specification field_specification form_state field_state/>
+                <#break>
+            <#case 'radio'>
+                <#break>
+            <#case 'select'>
+                <@render_selector form_specification field_specification form_state field_state/>
+                <#break>
+            <#case 'button'>
+            <#case 'submit'>
+            <#case 'cancel'>
+                <@render_button form_specification field_specification form_state field_state/>
+                <#break>
+        </#switch>
+    </div>
 </#macro>
 
 <#-- Renders an input field. Input type will be the same as field_specification.type. -->
@@ -56,9 +58,9 @@
     <#if field_specification.valuesSupplier??>
         <h4>${field_specification.label}</h4>
         <#list field_specification.valuesSupplier.get() as value, label>
-            <label for="${field_specification.path}">
+            <label for="${field_specification.path}-${value?index}">
                 <@compress single_line=true><input type="checkbox"
-                    id="${field_specification.path}"
+                    id="${field_specification.path}-${value?index}"
                     name="${field_specification.path}"
                     value="${value}"
                     <#if field_state.valueContains(value)>checked</#if>
