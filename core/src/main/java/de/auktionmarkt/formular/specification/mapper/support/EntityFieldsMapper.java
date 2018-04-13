@@ -75,7 +75,6 @@ public class EntityFieldsMapper extends AbstractAnnotatedInputFieldsMapper {
 
     @Override
     public boolean supportsField(Class<?> model, PropertyDescriptor propertyDescriptor, TypeDescriptor typeDescriptor) {
-        System.out.println("Property asd " + propertyDescriptor.getName() + ": " + typeDescriptor.hasAnnotation(EntityReference.class) + " "  + super.supportsField(model, propertyDescriptor, typeDescriptor));
         return typeDescriptor.hasAnnotation(EntityReference.class) &&
                 super.supportsField(model, propertyDescriptor, typeDescriptor);
     }
