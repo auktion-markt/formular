@@ -46,6 +46,7 @@ public class FieldState {
      *
      * @param value The form value of the field (must be either {@code null}, a {@link String}, a {@code boolean} or
      *              an instance of {@link Collection}.
+     * @param valueSet {@code true} when value was set explicitly
      * @param errors A {@link Collection} of errors
      * @throws NullPointerException Is thrown when {@code errors} is {@code null}
      * @throws IllegalArgumentException Is thrown when {@code value} is not {@code null} and not an {@link String} or
