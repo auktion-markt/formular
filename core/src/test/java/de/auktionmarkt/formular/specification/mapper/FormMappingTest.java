@@ -48,7 +48,8 @@ public class FormMappingTest {
         DefaultFieldsMapperService fieldsMapperService =
                 new DefaultFieldsMapperService(Mockito.mock(BeanFactory.class), conversionService);
         fieldsMapperService.sort();
-        formMapper = new DefaultFormMapper(fieldsMapperService);
+        BeanFactory beanFactory = Mockito.mock(BeanFactory.class);
+        formMapper = new DefaultFormMapper(beanFactory, fieldsMapperService);
     }
 
     @SuppressWarnings("unchecked")

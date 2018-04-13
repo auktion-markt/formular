@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
  */
 public class DefaultStateFactory implements StateFactory {
 
+    private static final FieldState EMPTY_STATE = new FieldState("", true, Collections.emptySet());
+
     private final MessageSource messageSource;
     private final ConversionService conversionService;
 
@@ -97,17 +99,21 @@ public class DefaultStateFactory implements StateFactory {
         Map<String, FieldState> fieldStates = new HashMap<>(fieldSpecificationMap.size());
         for (FieldSpecification fieldSpecification : fieldSpecificationMap.values()) {
             String path = fieldSpecification.getPath();
-            boolean isSet = bindingResult.getRawFieldValue(path) != null;
             FieldState fieldState;
-            if (isSet) {
-                List<String> fieldErrors = bindingResult.getFieldErrors().stream()
-                        .map(error -> messageSource.getMessage(error, LocaleContextHolder.getLocale()))
-                        .collect(Collectors.toList());
-                Object value = bindingResult.getFieldValue(fieldSpecification.getPath());
-                value = convertWhenNecessary(value);
-                fieldState = new FieldState(value, true, fieldErrors);
+            if (!path.isEmpty()) {
+                boolean isSet = bindingResult.getRawFieldValue(path) != null;
+                if (isSet) {
+                    List<String> fieldErrors = bindingResult.getFieldErrors().stream()
+                            .map(error -> messageSource.getMessage(error, LocaleContextHolder.getLocale()))
+                            .collect(Collectors.toList());
+                    Object value = bindingResult.getFieldValue(fieldSpecification.getPath());
+                    value = convertWhenNecessary(value);
+                    fieldState = new FieldState(value, true, fieldErrors);
+                } else {
+                    fieldState = new FieldState(createDefaultValue(fieldSpecification), false, Collections.emptyList());
+                }
             } else {
-                fieldState = new FieldState(createDefaultValue(fieldSpecification), false, Collections.emptyList());
+                fieldState = EMPTY_STATE;
             }
             fieldStates.put(fieldSpecification.getPath(), fieldState);
         }
@@ -119,13 +125,16 @@ public class DefaultStateFactory implements StateFactory {
         if (value != null) {
             TypeDescriptor formValueType = TypeDescriptor.forObject(value);
             TypeDescriptor targetType = decideTypeDescriptor(formValueType);
-            value = conversionService.convert(value, formValueType, targetType);
+            if (!TypeDescriptors.VOID.equals(targetType))
+                value = conversionService.convert(value, formValueType, targetType);
         }
         return value;
     }
 
     private static TypeDescriptor decideTypeDescriptor(TypeDescriptor original) {
-        if (original.isCollection() || original.isArray())
+        if (original == null)
+            return TypeDescriptors.VOID;
+        else if (original.isCollection() || original.isArray())
             return TypeDescriptors.STRING_LIST;
         else if (TypeDescriptors.BOOLEAN_TYPE.equals(original))
             return TypeDescriptors.BOOLEAN_TYPE;

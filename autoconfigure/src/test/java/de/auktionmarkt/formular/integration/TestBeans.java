@@ -21,6 +21,7 @@ import de.auktionmarkt.formular.specification.mapper.FormMapper;
 import de.auktionmarkt.formular.specification.mapper.support.CachedFormMapper;
 import de.auktionmarkt.formular.specification.mapper.support.DefaultFormMapper;
 import de.auktionmarkt.formular.specification.mapper.FieldsMapperService;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,8 +31,8 @@ import org.springframework.context.annotation.Configuration;
 public class TestBeans {
 
     @Bean
-    public FormMapper formMapper(FieldsMapperService fieldsMapperService) {
+    public FormMapper formMapper(BeanFactory beanFactory, FieldsMapperService fieldsMapperService) {
         // ToDo: Encapsulate in autoconfiguration
-        return new CachedFormMapper(new DefaultFormMapper(fieldsMapperService));
+        return new CachedFormMapper(new DefaultFormMapper(beanFactory, fieldsMapperService));
     }
 }

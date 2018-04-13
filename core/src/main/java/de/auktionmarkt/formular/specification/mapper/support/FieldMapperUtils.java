@@ -68,9 +68,15 @@ public class FieldMapperUtils {
     @SuppressWarnings("unchecked")
     public static Supplier<String> getStringSupplier(BeanFactory beanFactory, PropertyDescriptor propertyDescriptor,
                                                      String beanName, String labelValue) {
+        return getStringSupplier(beanFactory, propertyDescriptor::getDisplayName, beanName, labelValue);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Supplier<String> getStringSupplier(BeanFactory beanFactory, Supplier<String> fallback,
+                                                     String beanName, String labelValue) {
         if (labelValue.isEmpty()) {
             if (beanName.isEmpty())
-                return propertyDescriptor::getDisplayName;
+                return fallback;
             else
                 return beanFactory.getBean(beanName, Supplier.class);
         } else {

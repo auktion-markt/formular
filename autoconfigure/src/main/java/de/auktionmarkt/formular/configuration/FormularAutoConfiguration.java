@@ -67,8 +67,8 @@ public class FormularAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(FormMapper.class)
-    public DefaultFormMapper formMapper(FieldsMapperService fieldsMapperService) {
-        return new DefaultFormMapper(fieldsMapperService);
+    public DefaultFormMapper formMapper(BeanFactory beanFactory, FieldsMapperService fieldsMapperService) {
+        return new DefaultFormMapper(beanFactory, fieldsMapperService);
     }
 
     @Bean

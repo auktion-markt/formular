@@ -91,7 +91,9 @@ public class FormIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString("<<label for entitySingleSelected>>")))
                 .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString("<<label for entityMultiSelected>>")))
 
-                .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString("<<label for checkbox>>")));
+                .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString("<<label for checkbox>>")))
+
+                .andExpect(MockMvcResultMatchers.content().string(CoreMatchers.containsString("<<submit for form>>")));
 
         // Check if validation result is displayed properly
         requestBuilder = MockMvcRequestBuilders.post("/test_form")

@@ -34,4 +34,5 @@ public class TypeDescriptors {
     public static final TypeDescriptor STRING_LIST = TypeDescriptor.collection(List.class, STRING_TYPE);
     public static final TypeDescriptor BOOLEAN_TYPE = TypeDescriptor.valueOf(Boolean.class);
     public static final TypeDescriptor BOOLEAN_PRIMITIVE = TypeDescriptor.valueOf(boolean.class);
+    public static final TypeDescriptor VOID = TypeDescriptor.valueOf(void.class);
 }

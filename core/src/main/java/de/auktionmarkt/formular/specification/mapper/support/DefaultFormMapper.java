@@ -18,6 +18,7 @@ package de.auktionmarkt.formular.specification.mapper.support;
 
 import de.auktionmarkt.formular.specification.FieldSpecification;
 import de.auktionmarkt.formular.specification.annotation.FormElement;
+import de.auktionmarkt.formular.specification.annotation.FormSubmitField;
 import de.auktionmarkt.formular.specification.mapper.FieldsMapper;
 import de.auktionmarkt.formular.specification.mapper.FieldsMapperService;
 import de.auktionmarkt.formular.specification.mapper.FormMapper;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.core.convert.TypeDescriptor;
 
 import java.beans.PropertyDescriptor;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -40,6 +43,7 @@ public class DefaultFormMapper implements FormMapper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFormMapper.class);
 
+    private final BeanFactory beanFactory;
     private final FieldsMapperService fieldsMapperService;
 
     @Override
@@ -85,6 +89,15 @@ public class DefaultFormMapper implements FormMapper {
             LOGGER.trace("No accessible fields on class {}", dataClass);
             fields = Collections.emptyList();
         }
+
+        FormSubmitField submitField = dataClass.getAnnotation(FormSubmitField.class);
+        if (submitField != null) {
+            Supplier<String> labelSupplier = FieldMapperUtils.getStringSupplier(beanFactory, () -> "Submit",
+                    submitField.labelSupplierBean(), submitField.label());
+            fields.add(new FieldSpecification(null, null, labelSupplier, "",
+                    "button", Collections.emptyMap(), Integer.MAX_VALUE, null));
+        }
+
         return fields;
     }
 }

@@ -21,6 +21,7 @@ import de.auktionmarkt.formular.specification.annotation.EntityReference;
 import de.auktionmarkt.formular.specification.annotation.FormElement;
 import de.auktionmarkt.formular.specification.annotation.FormEmbedded;
 import de.auktionmarkt.formular.specification.annotation.FormInput;
+import de.auktionmarkt.formular.specification.annotation.FormSubmitField;
 import lombok.Data;
 
 import javax.validation.constraints.Max;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Data
+@FormSubmitField(label = "<<submit for form>>")
 class TestForm {
 
     @FormElement

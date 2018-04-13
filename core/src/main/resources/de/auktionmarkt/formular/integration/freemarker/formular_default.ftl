@@ -28,6 +28,11 @@
         <#case 'select'>
             <@render_selector form_specification field_specification form_state field_state/>
             <#break>
+        <#case 'button'>
+        <#case 'submit'>
+        <#case 'cancel'>
+            <@render_button form_specification field_specification form_state field_state/>
+            <#break>
     </#switch>
 </#macro>
 
@@ -86,4 +91,8 @@
     <#if field_state.errors?has_content>
         <span class="form-errors">Errors on this field: <#list field_state.errors as error>${error}<#sep>, </#list></span>
     </#if>
+</#macro>
+
+<#macro render_button form_specification field_specification form_state field_state>
+    <button <#if field_specification.type != 'button'>type="${field_specification.type}"</#if>>${field_specification.label}</button>
 </#macro>
